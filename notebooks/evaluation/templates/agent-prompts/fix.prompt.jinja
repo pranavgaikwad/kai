@@ -1,0 +1,13 @@
+## Input File
+
+```java
+{{ src_file_contents | safe }}
+```
+
+## Issues
+
+{% for incident in incidents %}
+### Incident {{ loop.index0 }}
+Line number: {{ incident.line_number }}
+Message: {{ incident.message }}
+{% endfor %}

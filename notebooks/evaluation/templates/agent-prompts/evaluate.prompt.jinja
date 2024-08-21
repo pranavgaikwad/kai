@@ -1,0 +1,19 @@
+## Input File
+
+```java
+{{ input_file | safe }}
+```
+
+## Output File
+
+```java
+{{ output_file | safe }}
+```
+
+## Issues
+
+{% for incident in incidents %}
+### Incident {{ loop.index0 }}
+Line number: {{ incident.line_number }}
+Message: {{ incident.message }}
+{% endfor %}
