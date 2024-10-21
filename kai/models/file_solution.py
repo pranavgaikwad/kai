@@ -12,6 +12,8 @@ class FileSolutionContent(BaseModel):
     reasoning: str
     updated_file: str
     additional_info: str
+    llm_results: list[str] = []
+    used_prompts: list[str] = []
 
 
 def guess_language(code: str, filename: str = None) -> str:
