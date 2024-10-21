@@ -394,6 +394,7 @@ class IncidentStore:
         violation_name: str,
         incident_variables: dict,
         incident_snip: Optional[str] = None,
+        limit: int = 10,
     ) -> list[Solution]:
         """
         Returns a list of solutions for the given incident. Exact matches only.
@@ -421,6 +422,7 @@ class IncidentStore:
                 .where(SQLIncident.ruleset_name == violation.ruleset_name)
                 .where(SQLIncident.solution_id.isnot(None))
                 .where(self.backend.json_exactly_equal(incident_variables))
+                .limit(limit)
             )
 
             result: list[Solution] = []
@@ -434,6 +436,10 @@ class IncidentStore:
                 ).first()
 
                 result.append(accepted_solution.solution)
+
+                if len(result) >= limit:
+                    break
+
             return result
 
     def post_process(self, limit=5):

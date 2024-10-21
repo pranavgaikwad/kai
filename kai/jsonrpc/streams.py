@@ -168,7 +168,7 @@ class BareJsonStream(JsonRpcStream):
         self.chunk_size = 512
 
     def send(self, msg: JsonRpcRequest | JsonRpcResponse) -> None:
-        json_req = msg.model_dump_json()
+        json_req = f"{msg.model_dump_json()}\n"
 
         # Prevent infinite recursion
         if not isinstance(msg, JsonRpcRequest) or msg.method != "logMessage":
@@ -190,38 +190,31 @@ class BareJsonStream(JsonRpcStream):
             self.send_file.write(json_req.encode())
             self.send_file.flush()
 
-    def get_from_buffer(self) -> JsonRpcError | JsonRpcRequest | JsonRpcResponse | None:
-        try:
-            msg, idx = self.decoder.raw_decode(self.buffer)
-            self.buffer = self.buffer[idx:]
-
-            log.log(TRACE, "recv msg: %s", msg)
-            log.log(TRACE, "recv buffer: %s", self.buffer)
-
-            if "method" in msg:
-                return JsonRpcRequest.model_validate(msg)
-            else:
-                return JsonRpcResponse.model_validate(msg)
-        except json.JSONDecodeError:
-            return None
-        except Exception as e:
-            return JsonRpcError(
-                code=JsonRpcErrorCode.ParseError,
-                message=f"Invalid JSON: {e}",
-            )
-
     def recv(self) -> JsonRpcError | JsonRpcRequest | JsonRpcResponse | None:
         with self.recv_lock:
-            result = self.get_from_buffer()
-            if result is not None:
-                return result
+            if self.recv_file.closed:
+                return None
 
-            while chunk := self.recv_file.read1(self.chunk_size):
-                self.buffer += chunk.decode("utf-8")
-                log.log(TRACE, "recv buffer: %s", self.buffer)
+            result = self.recv_file.readline()
 
-                result = self.get_from_buffer()
-                if result is not None:
-                    return result
+            # EOF
+            if not result:
+                return None
 
-        return None
+            try:
+                msg, idx = self.decoder.raw_decode(result.decode("utf-8"))
+                log.log(TRACE, "recv msg: %s", msg)
+                if "method" in msg:
+                    return JsonRpcRequest.model_validate(msg)
+                else:
+                    return JsonRpcResponse.model_validate(msg)
+            except json.JSONDecodeError as e:
+                return JsonRpcError(
+                    code=JsonRpcErrorCode.ParseError,
+                    message=f"Invalid JSON: {e}",
+                )
+            except Exception as e:
+                return JsonRpcError(
+                    code=JsonRpcErrorCode.ParseError,
+                    message=f"Unknown parsing error: {e}",
+                )
