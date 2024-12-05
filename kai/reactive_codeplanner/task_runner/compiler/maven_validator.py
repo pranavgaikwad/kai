@@ -56,7 +56,7 @@ class MavenCompileStep(ValidationStep):
                 f"Setting the maven cache with {len(self.last_compilation_errors)} compilation errors"
             )
         errors = build_errors + dependency_errors + compilation_errors + catchall_errors
-        errors = sorted(errors, key=attrgetter("parse_lines"))
+        errors = sorted(errors, key=attrgetter("message"))
         return ValidationResult(passed=not errors, errors=errors)
 
 

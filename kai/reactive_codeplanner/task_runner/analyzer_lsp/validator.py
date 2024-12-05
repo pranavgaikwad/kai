@@ -82,7 +82,7 @@ class AnalyzerLSPStep(ValidationStep):
 
         errors = sorted(
             self.__parse_analyzer_lsp_output(analyzer_output.result),
-            key=attrgetter("loc"),
+            key=attrgetter("incident.uri"),
         )
         return ValidationResult(
             passed=not errors, errors=cast(list[ValidationError], errors)
