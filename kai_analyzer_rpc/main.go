@@ -58,6 +58,8 @@ func main() {
 
 	l := logr.FromSlogHandler(logger)
 
+	l.Info("[dylan] Starting analyzer service")
+
 	// Check if Java exists on the PATH
 	if err := exec.Command("java", "-version").Run(); err != nil {
 		panic("Java is not installed or not on the PATH")

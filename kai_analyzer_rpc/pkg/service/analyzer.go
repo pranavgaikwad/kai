@@ -116,6 +116,9 @@ type Response struct {
 }
 
 func (a *Analyzer) Analyze(args Args, response *Response) error {
+	a.Logger.Info("[dylan] entering analyze()")
+	defer a.Logger.Info("[dylan] returning from analyze()")
+
 	selectors := []engine.RuleSelector{}
 	if args.LabelSelector != "" {
 		selector, err := labels.NewLabelSelector[*engine.RuleMeta](args.LabelSelector, nil)
@@ -166,6 +169,8 @@ func (a *Analyzer) setCache(rulesets []konveyor.RuleSet) {
 func (a *Analyzer) updateCache(rulesets []konveyor.RuleSet) {
 	a.cacheMutex.Lock()
 	defer a.cacheMutex.Unlock()
+	a.Logger.Info("[dylan] entering updateCache()")
+	defer a.Logger.Info("[dylan] returning from updateCache()")
 
 	for _, r := range rulesets {
 		for violationName, v := range r.Violations {
@@ -215,6 +220,9 @@ func (a *Analyzer) updateCache(rulesets []konveyor.RuleSet) {
 }
 
 func (a *Analyzer) invlaidateCachePerFile(paths []string) {
+	a.Logger.Info("[dylan] entering invalidateCache()")
+	defer a.Logger.Info("[dylan] returning from invalidateCache()")
+
 	a.cacheMutex.Lock()
 	defer a.cacheMutex.Unlock()
 	for _, p := range paths {

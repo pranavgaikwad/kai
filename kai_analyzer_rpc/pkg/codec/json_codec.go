@@ -185,6 +185,9 @@ func (c *serverCodec) ReadRequestBody(x any) error {
 var null = json.RawMessage([]byte("null"))
 
 func (c *serverCodec) WriteResponse(r *rpc.Response, x any) error {
+	c.logger.Info("[dylan] entering writeResponse()")
+	defer c.logger.Info("[dylan] returning from writeResponse()")
+
 	c.logger.V(7).Info("writing response", "id", r.Seq, "pending", c.pending)
 	c.mutex.Lock()
 	b, ok := c.pending[r.Seq]

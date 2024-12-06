@@ -229,6 +229,7 @@ class BareJsonStream(JsonRpcStream):
 
                     msg, idx = self.decoder.raw_decode(result.decode("utf-8"))
                     self.log.log(TRACE, "recv msg: %s", msg)
+                    self.log.debug("[dylan] receiving message", msg)
                     if "method" in msg:
                         return JsonRpcRequest.model_validate(msg)
                     else:

@@ -235,7 +235,7 @@ class JsonRpcServer(threading.Thread):
         self.log.debug("Server thread started")
 
         while not self.shutdown_flag:
-            self.log.debug("Waiting for message")
+            self.log.debug("[dylan] Waiting for message")
             tracer = trace.get_tracer("json_rpc")
             msg = self.jsonrpc_stream.recv()
             if msg is None:
