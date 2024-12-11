@@ -50,7 +50,7 @@ class AnalyzerTaskRunner(TaskRunner):
 
         # convert the task to the MavenCompilerError
         if not isinstance(task, AnalyzerRuleViolation):
-            return TaskResult(encountered_errors=[], modified_files=[])
+            return TaskResult(encountered_errors=[], modified_files=[], summary="")
 
         with open(task.file) as f:
             src_file_contents = f.read()
@@ -71,6 +71,7 @@ class AnalyzerTaskRunner(TaskRunner):
             return TaskResult(
                 encountered_errors=["response from agent was invalid"],
                 modified_files=[],
+                summary="",
             )
 
         current_span = trace.get_current_span()
@@ -83,6 +84,7 @@ class AnalyzerTaskRunner(TaskRunner):
             return TaskResult(
                 encountered_errors=["file to modify was not returned"],
                 modified_files=[],
+                summary=result.reasoning or "",
             )
 
         # rewrite the file, based on the java file returned
@@ -101,12 +103,14 @@ class AnalyzerTaskRunner(TaskRunner):
                 ),
             )
             return TaskResult(
-                modified_files=[result.file_to_modify], encountered_errors=[]
+                modified_files=[result.file_to_modify],
+                encountered_errors=[],
+                summary=result.reasoning or "",
             )
         else:
             logger.info(f"did not update file {result.file_to_modify}")
 
-        return TaskResult(modified_files=[], encountered_errors=[])
+        return TaskResult(modified_files=[], encountered_errors=[], summary="")
 
 
 class AnalyzerTaskSpawningResult(SpawningResult):
@@ -132,4 +136,5 @@ class AnalyzerTaskSpawningResult(SpawningResult):
             issues=self.issues,
             target_technology=" and ".join(self.task.targets),
             task=self.task,
+            background="",
         )

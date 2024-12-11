@@ -69,7 +69,7 @@ class MavenCompilerAgent(Agent):
         )
 
         ai_message = self.model_provider.invoke(
-            [self.system_message, HumanMessage(content=content)],
+            [system_message, HumanMessage(content=content)],
             ask.cache_path_resolver,
         )
 

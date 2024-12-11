@@ -261,10 +261,10 @@ Message:{message}
                         logger.info("Need to call sub-agent for selecting FQDN")
                         r = self.child_agent.execute(
                             FQDNDependencySelectorRequest(
-                                request.file_path,
-                                ask.task,
-                                request.message,
-                                a.code,
+                                file_path=request.file_path,
+                                task=ask.task,
+                                msg=request.message,
+                                code=a.code,
                                 query=[],
                                 times=0,
                                 background=ask.background,
